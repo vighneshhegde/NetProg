@@ -1,0 +1,6 @@
+int
+main ()
+{
+  execlp( "ls", "ls", "-l", (char *) 0);
+  printf ("hello");
+}
