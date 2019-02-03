@@ -36,7 +36,7 @@ void handler(int signal){
 
 void randsig(int pid){
 	int r = rand()%31+1;
-	while(r==9||r==12||r==19){//except kill, stop, and usr1 signals.
+	while(r==9||r==19){//except kill and stop signals.
 		r = rand()%31+1;
 	}
 	kill(pid,r);
@@ -87,7 +87,7 @@ int main (int argc, char **argv){				//n,k,l,m
 	close(fd);	
 	FILE *f = fopen("pid.txt","a");
 	
-	signal(SIGUSR1,sigusr1_handler);
+	signal(12,sigusr1_handler);
 	signal(1,handler);
 	signal(2,handler);
 	signal(3,handler);
@@ -127,6 +127,7 @@ int main (int argc, char **argv){				//n,k,l,m
 					fprintf(f,"%d\n",getpid());
 					fclose(f);
 					pause();
+					signal(12, handler);//changing the handler because the job of SIGUSR1 is over.
 					while(1){
 						if(count<l)	stepc(m,total);
 						else{
@@ -140,6 +141,7 @@ int main (int argc, char **argv){				//n,k,l,m
 			fprintf(f,"%d\n",getpid());
 			fclose(f);
 			pause();
+			signal(12, handler);//changing the handler because the job of SIGUSR1 is over.
 			while(1){
 				if(count<l){
 					stepc(m,total);
@@ -177,8 +179,9 @@ int main (int argc, char **argv){				//n,k,l,m
 		}
 	}
 
-	kill(0,SIGUSR1);
+	kill(0,12);
 	//part(c) begins here
+	signal(12, handler);//changing the handler because the job of SIGUSR1 is over.
 	while(1){
 		if(count<l){
 			stepc(m,total);
