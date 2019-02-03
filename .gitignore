@@ -21,3 +21,8 @@
 *.swp
 *.swo
 *.out
+
+# .tar ,.zip and other archives
+*.tar
+*.zip
+*.gz
