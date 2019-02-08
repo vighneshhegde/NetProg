@@ -20,7 +20,7 @@ main ()
       while (i < 10)
         {
           write (p[1], msg, MSGSIZE);
-          sleep (2);
+          //sleep (2);
           read (p[0], inbuff, MSGSIZE);
           printf ("Parent: %s\n", inbuff);
           i++;
@@ -32,7 +32,7 @@ main ()
       i = 0;
       while (i < 10)
         {
-          sleep (1);
+          //sleep (1);
           read (p[0], inbuff, MSGSIZE);
           printf ("Child: %s\n", inbuff);
           write (p[1], "i am fine", strlen ("i am fine")+1);
