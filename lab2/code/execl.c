@@ -1,6 +1,6 @@
-int
-main ()
+int main ()
 {
-  execlp( "ls", "ls", "-l", (char *) 0);
+  char* arr[] = {"exit",(char*)0};
+  execvp("exit",arr);
   printf ("hello");
 }

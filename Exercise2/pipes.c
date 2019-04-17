@@ -7,13 +7,11 @@
 #include <string.h>
 #include <ctype.h>
 
-#define MSGSIZE 20
+#define MSGSIZE 200 //change this to larger value if necessary
 
 int main ()
 {
   int i;
-  char *msg = "How are you?";
-
   char inbuff[MSGSIZE];
   int p1[2],p2[2],p3[2],p4[2],p5[2],p6[2];
   pid_t ret;
@@ -26,7 +24,6 @@ int main ()
 
   if (fork ()== 0){//C1
   	read (p1[0], inbuff, MSGSIZE);
-  	int i;
   	for(i=0;inbuff[i];i++) inbuff[i]=toupper(inbuff[i]); 
 	printf("Output of C1(pid=%d) is %s\n",getpid(),inbuff);
   	write (p2[1], inbuff, MSGSIZE);
@@ -55,8 +52,6 @@ int main ()
   	inbuff[strlen(inbuff)-1]='\0';
 	printf("Output of C5(pid=%d) is %s\n",getpid(),inbuff);	      
   	write (p6[1], inbuff, MSGSIZE);
-
-	
   }
   else//parent
   {

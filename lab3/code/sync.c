@@ -14,23 +14,23 @@ int main ()
 
 signal(SIGUSR1, sigusr);
 
-sigset_t mask;
-sigset_t omask;
+//sigset_t mask;
+//sigset_t omask;
 
-sigemptyset (&mask);
-sigaddset (&mask, SIGUSR1);
+//sigemptyset (&mask);
+//sigaddset (&mask, SIGUSR1);
 
-sigprocmask(SIG_BLOCK,&mask,&omask);
+//sigprocmask(SIG_BLOCK,&mask,&omask);
 
   ret = fork ();
   if (ret == 0)
     {
-      for (i = 0; i < 5000; i++){
+      for (i = 0; i < 5; i++){
     	
         printf ("Child: %d\n", i);
 		kill(getppid(),SIGUSR1);
-		//pause();	
-		sigsuspend(&omask);
+		pause();	
+		//sigsuspend(&omask);
 //		sigprocmask(SIG_UNBLOCK,&mask,&omask);    
 	}
       printf ("Child ends\n");
@@ -40,12 +40,12 @@ sigprocmask(SIG_BLOCK,&mask,&omask);
     {
       //pause();
       //printf ("Parent resumes.\n");
-      for (j = 0; j < 5000; j++){
+      for (j = 0; j < 5; j++){
     	//sigprocmask(SIG_BLOCK,&mask,&omask);    
-		sigsuspend(&omask);
+		//sigsuspend(&omask);
 		printf ("Parent: %d\n", j);
 		kill(ret,SIGUSR1);
-		//pause();
+		pause();
 		
 //		sigprocmask(SIG_UNBLOCK,&mask,&omask);    
 		}
