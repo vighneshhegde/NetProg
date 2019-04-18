@@ -6,18 +6,19 @@
 #include <netinet/in.h>
 #include <strings.h>
 #include <sys/socket.h>
-int main()
+int main(int argc,char** argv)
 {
     char *ptr, **pptr, url[50], address[100];
     char str[INET_ADDRSTRLEN];
     struct hostent *hptr;
-    printf("Enter Hostname:");
-    while ((fgets(url,50,stdin)), !feof(stdin))
+    // printf("Enter Hotname:");
+    // while ((fgets(url,50)), !feof(stdin))
     {
-        ptr = url;
+        ptr = argv[1];
         if ((hptr = gethostbyname(ptr)) == NULL)
         {
-            continue;
+            perror("gethostbyname: ");
+            exit(1);
         }
         strcpy(url, hptr->h_name);
         printf("official hostname:%s\n", hptr->h_name);
