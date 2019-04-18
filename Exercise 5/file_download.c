@@ -7,21 +7,35 @@
 #include <strings.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
+
+char* getFileName(char* url){
+    char* save;
+    char* fname = strtok(url,"/");
+    // printf("%s\n",save);
+    while(fname!=NULL){
+        save = fname;
+        fname = strtok(NULL,"/");
+    }
+    // fname = strtok(NULL,"");
+    return save;
+}
+
+
 int main(int argc, char** argv)
 {
     char *ptr, **pptr, url[100], address[100];
     char str[INET_ADDRSTRLEN];
     struct hostent *hptr;
-    char dlim = '/';
-    char* ip, *restOfUrl;
+    char* ip, *restOfUrl,*fname;
     printf("Enter Hostname:");
     // while ((fgets(url,50,stdin)), !feof(stdin))
     fgets(url,100,stdin);
     url[strlen(url)-1]='\0';
     {
-        ptr = strtok(url,&dlim);
+        ptr = strtok(url,"/");
         if(strcmp(ptr,"http:")==0||strcmp(ptr,"https:")==0){
-            ptr = strtok(NULL,&dlim);
+            ptr = strtok(NULL,"/");
             restOfUrl = strtok(NULL,"");
             // ptr = strtok(NULL,&dlim);
         }
@@ -60,33 +74,63 @@ int main(int argc, char** argv)
 	server.sin_addr.s_addr=inet_addr(ip);
 	inet_aton(ip,&server.sin_addr);
 	inet_pton(AF_INET, ip, &server.sin_addr);
-	server.sin_port = htons(443);
+	server.sin_port = htons(80);
 
 	if(connect(sd, (struct sockaddr*) &server, sizeof(server))!=0){
         perror("connect(): ");
         exit(1);
     }
-    printf("Connected to %d\n",sd);
+    // printf("Connected to %d\n",sd);
 
-    char httpreq[1000];
-    // printf("%s\n",restOfUrl);
+    char* httpreq = malloc(5000);
+    // printf("%s\n",getFileName(restOfUrl));
     sprintf(httpreq, "GET /%s HTTP/1.1\r\nHost: %s\r\n\r\n", restOfUrl, url);
 
     if(send(sd,httpreq,strlen(httpreq),0)<0){
         perror("send(): ");
         exit(1);
     }
-    printf("sent %s\n",httpreq);
+    // printf("sent %s\n",httpreq);
 
-    bzero(httpreq,1000);
+    bzero(httpreq,5000);
     size_t recvlen;
 
-    FILE* fp = fopen("write.txt","w");
-    do{
-        recvlen = recv(sd,httpreq,1000,0);
-        printf("received %d, %s",recvlen,httpreq);
-        fwrite(httpreq,1,recvlen,fp);
-    }while(recvlen==1000);
+    fname = getFileName(restOfUrl);
+    FILE* fp = fopen(fname,"w");
+    recvlen = recv(sd,httpreq,5000,0);
+    // printf("received %lu, %s\n\n",recvlen,httpreq); 
+    char* len, *buf = strtok(httpreq,"\n");
+    int contentLength,temp=0;
+    while(strcmp(buf,"\r")!=0){
+        // printf("%s\n",buf);
+        temp+=strlen(buf)+1;
+        len = strstr(buf,"Content-Length:");
+        if(len!=NULL){
+            contentLength = atoi(buf+strlen("Content-Length:"));
+            // printf("%d %d\n",contentLength,recvlen);
+        }
+        buf = strtok(NULL,"\n");  
+    }
+    temp+=2;
+    temp=recvlen-temp;
+    strcpy(httpreq,strtok(NULL,""));
+    // printf("%d %d\n",strlen(httpreq),recvlen-temp);
+    while(1){
+        // printf("%s",httpreq);
+        fwrite(httpreq,1,temp,fp);
+        // printf("written %d\n",recvlen);
+        if(recvlen==5000){
+            recvlen = recv(sd,httpreq,1000,0);
+            temp = recvlen;
+        }
+        else{ 
+            printf("%d\n",recvlen);
+            break;
+        
+        }
+    }
+
     close(sd);
+    fclose(fp);
     exit(0);
 }
