@@ -27,7 +27,8 @@ int main(int argc, char** argv)
     char *ptr, **pptr, url[100], address[100];
     char str[INET_ADDRSTRLEN];
     struct hostent *hptr;
-    char* ip, *restOfUrl,*fname;
+    const char* ip;
+    char*restOfUrl,*fname;
     printf("Enter Hostname:");
     // while ((fgets(url,50,stdin)), !feof(stdin))
     fgets(url,100,stdin);
@@ -96,7 +97,7 @@ int main(int argc, char** argv)
     size_t recvlen;
 
     fname = getFileName(restOfUrl);
-    FILE* fp = fopen(fname,"w");
+    FILE* fp = fopen(fname,"wb");//wb because we don't know what kind of file it is, it could be text
     recvlen = recv(sd,httpreq,5000,0);
     // printf("received %lu, %s\n\n",recvlen,httpreq); 
     char* len, *buf = strtok(httpreq,"\n");
@@ -113,20 +114,22 @@ int main(int argc, char** argv)
     }
     temp+=2;
     temp=recvlen-temp;
-    strcpy(httpreq,strtok(NULL,""));
-    // printf("%d %d\n",strlen(httpreq),recvlen-temp);
+    memcpy(httpreq,strtok(NULL,""),temp);//strcpy does not copy in the beginning properly, for some reason.
+    // printf("%d %d \n",contentLength,recvlen);
     while(1){
         // printf("%s",httpreq);
-        fwrite(httpreq,1,temp,fp);
+        fwrite(httpreq,temp,1,fp);
+            contentLength-=temp;
         // printf("written %d\n",recvlen);
-        if(recvlen==5000){
-            recvlen = recv(sd,httpreq,1000,0);
+        if(contentLength>0){
+            bzero(httpreq,5000);
+            recvlen = recv(sd,httpreq,5000,0);
             temp = recvlen;
         }
         else{ 
-            printf("%d\n",recvlen);
-            break;
         
+        // printf("%d\n",contentLength);
+           break;
         }
     }
 
