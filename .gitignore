@@ -28,4 +28,4 @@
 *.gz
 
 # annoying folders
-*/.vscode/*
+*.vscode/*
