@@ -26,3 +26,6 @@
 *.tar
 *.zip
 *.gz
+
+# annoying folders
+*/.vscode*
